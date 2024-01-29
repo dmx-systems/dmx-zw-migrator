@@ -31,8 +31,9 @@ public class Migration2 extends Migration {
         );
         plugin.setUri(LQ.LINQA_PLUGIN_URI);
         //
-        // Note topics
+        // Bilingual topics
         retypeBilingualTopics("note");
+        retypeBilingualTopics("textblock");
         // Globals
         retypeTopics("language");
         retypeTopics("translation_edited");
