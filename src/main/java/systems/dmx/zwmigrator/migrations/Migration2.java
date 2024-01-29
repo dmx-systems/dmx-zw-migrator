@@ -15,7 +15,7 @@ import systems.dmx.zwmigrator.ZW;
  * <p>
  * Runs ALWAYS.
  */
-public class Migration1 extends Migration {
+public class Migration2 extends Migration {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -32,35 +32,40 @@ public class Migration1 extends Migration {
         plugin.setUri(LQ.LINQA_PLUGIN_URI);
         //
         // Note topics
-        for (Topic note : dmx.getTopicsByType(ZW.ZW_NOTE)) {
-            note.setTypeUri(LQ.LINQA_NOTE);
-            ChildTopics ct = note.getChildTopics();
-            RelatedTopic de = ct.getTopic(ZW.ZW_NOTE_DE);
-            RelatedTopic fr = ct.getTopicOrNull(ZW.ZW_NOTE_FR);
-            RelatedTopic origLang = ct.getTopicOrNull(ZW.LANGUAGE + "#" + ZW.ORIGINAL_LANGUAGE);
-            RelatedTopic edited = ct.getTopicOrNull(ZW.TRANSLATION_EDITED);
-            RelatedTopic locked = ct.getTopicOrNull(ZW.LOCKED);
-            de.setTypeUri(LQ.LINQA_NOTE_TEXT);
-            de.getRelatingAssoc().setTypeUri(LQ.LANG1);
-            if (fr != null) {
-                fr.setTypeUri(LQ.LINQA_NOTE_TEXT);
-                fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
-            }
-            if (origLang != null) {
-                origLang.setTypeUri(LQ.LANGUAGE);               // TODO: retype globally (not per note)
-                origLang.getRelatingAssoc().setTypeUri(LQ.ORIGINAL_LANGUAGE);
-            }
-            if (edited != null) {
-                edited.setTypeUri(LQ.TRANSLATION_EDITED);       // TODO: retype globally (not per note)
-            }
-            if (locked != null) {
-                locked.setTypeUri(LQ.LOCKED);                   // TODO: retype globally (not per note)
-            }
-        }
+        retypeBilingualTopics("note");
+        // Globals
+        retypeTopics("language");
+        retypeTopics("translation_edited");
+        retypeTopics("locked");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void retype(String source) {
+    private void retypeBilingualTopics(String item) {
+        for (Topic topic : dmx.getTopicsByType("zukunftswerk." + item)) {
+            ChildTopics ct = topic.getChildTopics();
+            // text
+            RelatedTopic de = ct.getTopic("zukunftswerk." + item + ".de");
+            RelatedTopic fr = ct.getTopicOrNull("zukunftswerk." + item + ".fr");
+            de.setTypeUri("linqa." + item + "_text");
+            de.getRelatingAssoc().setTypeUri(LQ.LANG1);
+            if (fr != null) {
+                fr.setTypeUri("linqa." + item + "_text");
+                fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
+            }
+            // language
+            RelatedTopic origLang = ct.getTopicOrNull(ZW.LANGUAGE + "#" + ZW.ORIGINAL_LANGUAGE);
+            if (origLang != null) {
+                origLang.getRelatingAssoc().setTypeUri(LQ.ORIGINAL_LANGUAGE);
+            }
+            // retype composite
+            topic.setTypeUri("linqa." + item);
+        }
+    }
+
+    private void retypeTopics(String item) {
+        for (Topic topic : dmx.getTopicsByType("zukunftswerk." + item)) {
+            topic.setTypeUri("linqa." + item);
+        }
     }
 }
