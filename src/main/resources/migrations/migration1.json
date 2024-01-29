@@ -1,0 +1,410 @@
+[
+  {
+    "assoc_types": [
+      {
+        "value":       "Attachment",
+        "uri":         "linqa.attachment",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Original Language",
+        "uri":         "linqa.original_language",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "lang1",
+        "uri":         "linqa.lang1",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "lang2",
+        "uri":         "linqa.lang2",
+        "dataTypeUri": "dmx.core.text"
+      }
+    ]
+  },
+  {
+    "topic_types": [
+      // Language
+      {
+        "value":       "Language",
+        "uri":         "linqa.language",
+        "dataTypeUri": "dmx.core.text"
+      },
+      // Translation Edited
+      {
+        "value":       "Translation Edited",
+        "uri":         "linqa.translation_edited",
+        "dataTypeUri": "dmx.core.boolean"
+      },
+      // Locked
+      {
+        "value":       "Locked",
+        "uri":         "linqa.locked",
+        "dataTypeUri": "dmx.core.boolean"
+      },
+      // Document
+      {
+        "value":       "Document Name",
+        "uri":         "linqa.document_name",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Document",
+        "uri":         "linqa.document",
+        "dataTypeUri": "dmx.core.entity",
+        "compDefs": [
+          {
+            "childTypeUri":        "linqa.document_name",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang1",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.document_name",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang2",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.language",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.original_language",
+            "viewConfigTopics": [
+              {
+                "typeUri": "dmx.webclient.view_config",
+                "children": {
+                  "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
+                  "dmx.webclient.clearable": true
+                }
+              }
+            ]
+          },
+          {
+            "childTypeUri":        "linqa.translation_edited",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "linqa.locked",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.files.file",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang1"
+          },
+          {
+            "childTypeUri":        "dmx.files.file",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang2"
+          }
+        ],
+        "viewConfigTopics": [
+          {
+            "typeUri": "dmx.webclient.view_config",
+            "children": {
+              "dmx.webclient.add_to_create_menu": true,
+              "dmx.webclient.icon": "\uf016"
+            }
+          }
+        ]
+      },
+      // Textblock
+      {
+        "value":       "Textblock Text",
+        "uri":         "linqa.textblock_text",
+        "dataTypeUri": "dmx.core.html"
+      },
+      {
+        "value":       "Textblock",
+        "uri":         "linqa.textblock",
+        "dataTypeUri": "dmx.core.entity",
+        "compDefs": [
+          {
+            "childTypeUri":        "linqa.textblock_text",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang1",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.textblock_text",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang2",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.language",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.original_language",
+            "viewConfigTopics": [
+              {
+                "typeUri": "dmx.webclient.view_config",
+                "children": {
+                  "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
+                  "dmx.webclient.clearable": true
+                }
+              }
+            ]
+          },
+          {
+            "childTypeUri":        "linqa.translation_edited",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "linqa.locked",
+            "childCardinalityUri": "dmx.core.one"
+          }
+        ],
+        "viewConfigTopics": [
+          {
+            "typeUri": "dmx.webclient.view_config",
+            "children": {
+              "dmx.webclient.icon": "\uf036",
+              "dmx.webclient.add_to_create_menu": true
+            }
+          }
+        ]
+      },
+      // Comment
+      {
+        "value":       "Comment Text",
+        "uri":         "linqa.comment_text",
+        "dataTypeUri": "dmx.core.html"
+      },
+      {
+        "value":       "Comment",
+        "uri":         "linqa.comment",
+        "dataTypeUri": "dmx.core.entity",
+        "compDefs": [
+          {
+            "childTypeUri":        "linqa.comment_text",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang1",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.comment_text",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang2",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.language",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.original_language",
+            "viewConfigTopics": [
+              {
+                "typeUri": "dmx.webclient.view_config",
+                "children": {
+                  "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
+                  "dmx.webclient.clearable": true
+                }
+              }
+            ]
+          },
+          {
+            "childTypeUri":        "linqa.translation_edited",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "linqa.comment",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "linqa.document",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "linqa.textblock",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.files.file",
+            "childCardinalityUri": "dmx.core.many",
+            "customAssocTypeUri":  "linqa.attachment"
+          }
+        ],
+        "viewConfigTopics": [
+          {
+            "typeUri": "dmx.webclient.view_config",
+            "children": {
+              "dmx.webclient.icon": "\uf075",
+              "dmx.webclient.add_to_create_menu": true
+            }
+          }
+        ]
+      },
+      // Note
+      {
+        "value":       "Note Text",
+        "uri":         "linqa.note_text",
+        "dataTypeUri": "dmx.core.html"
+      },
+      {
+        "value":       "Note",
+        "uri":         "linqa.note",
+        "dataTypeUri": "dmx.core.entity",
+        "compDefs": [
+          {
+            "childTypeUri":        "linqa.note_text",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang1",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.note_text",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang2",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.language",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.original_language",
+            "viewConfigTopics": [
+              {
+                "typeUri": "dmx.webclient.view_config",
+                "children": {
+                  "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
+                  "dmx.webclient.clearable": true
+                }
+              }
+            ]
+          },
+          {
+            "childTypeUri":        "linqa.translation_edited",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "linqa.locked",
+            "childCardinalityUri": "dmx.core.one"
+          }
+        ],
+        "viewConfigTopics": [
+          {
+            "typeUri": "dmx.webclient.view_config",
+            "children": {
+              "dmx.webclient.icon": "\uf249",
+              "dmx.webclient.add_to_create_menu": true
+            }
+          }
+        ]
+      },
+      // Heading
+      {
+        "value":       "Heading Text",
+        "uri":         "linqa.heading_text",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Heading",
+        "uri":         "linqa.heading",
+        "dataTypeUri": "dmx.core.entity",
+        "compDefs": [
+          {
+            "childTypeUri":        "linqa.heading_text",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang1",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.heading_text",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.lang2",
+            "includeInLabel":      true
+          },
+          {
+            "childTypeUri":        "linqa.language",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "linqa.original_language",
+            "viewConfigTopics": [
+              {
+                "typeUri": "dmx.webclient.view_config",
+                "children": {
+                  "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
+                  "dmx.webclient.clearable": true
+                }
+              }
+            ]
+          },
+          {
+            "childTypeUri":        "linqa.translation_edited",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "linqa.locked",
+            "childCardinalityUri": "dmx.core.one"
+          }
+        ],
+        "viewConfigTopics": [
+          {
+            "typeUri": "dmx.webclient.view_config",
+            "children": {
+              "dmx.webclient.icon": "\uf1dc",
+              "dmx.webclient.add_to_create_menu": true
+            }
+          }
+        ]
+      },
+      // Arrow
+      {
+        "value":       "Arrow",
+        "uri":         "linqa.arrow",
+        "dataTypeUri": "dmx.core.entity",
+        "compDefs": [
+          {
+            "childTypeUri":        "linqa.locked",
+            "childCardinalityUri": "dmx.core.one"
+          }
+        ]
+      },
+      // Viewport
+      {
+        "value":       "Viewport",
+        "uri":         "linqa.viewport",
+        "dataTypeUri": "dmx.core.text"
+      },
+      // Editor / Editor Facet
+      {
+        "value":       "Editor",
+        "uri":         "linqa.editor",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Editor Facet",
+        "uri":         "linqa.editor_facet",
+        "dataTypeUri": "dmx.core.entity",
+        "compDefs": [
+          {
+            "childTypeUri":        "linqa.editor",
+            "childCardinalityUri": "dmx.core.one"
+          }
+        ]
+      },
+      // Show Email Address / Show Email Address Facet
+      {
+        "value":       "Show Email Address",
+        "uri":         "linqa.show_email_address",
+        "dataTypeUri": "dmx.core.boolean"
+      },
+      {
+        "value":       "Show Email Address Facet",
+        "uri":         "linqa.show_email_address_facet",
+        "dataTypeUri": "dmx.core.entity",
+        "compDefs": [
+          {
+            "childTypeUri":        "linqa.show_email_address",
+            "childCardinalityUri": "dmx.core.one"
+          }
+        ]
+      }
+    ],
+    "assoc_types": [
+      {
+        "value":       "Shared Workspace",
+        "uri":         "linqa.shared_workspace",
+        "dataTypeUri": "dmx.core.text"
+      }
+    ]
+  }
+]
