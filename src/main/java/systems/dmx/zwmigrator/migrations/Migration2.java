@@ -1,6 +1,7 @@
 package systems.dmx.zwmigrator.migrations;
 
 import static systems.dmx.core.Constants.*;
+import static systems.dmx.workspaces.Constants.*;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
@@ -21,7 +22,6 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        //
         // Plugin topic
         Topic plugin = dmx.getTopicByUri(ZW.ZW_PLUGIN_URI);
         plugin.update(mf.newChildTopicsModel()
@@ -30,7 +30,13 @@ public class Migration2 extends Migration {
             .set(PLUGIN_MIGRATION_NR, 2)
         );
         plugin.setUri(LQ.LINQA_PLUGIN_URI);
-        //
+        // "Team" workspace
+        dmx.getTopicByUri(ZW.TEAM_WORKSPACE_URI).update(
+            mf.newTopicModel(LQ.LINQA_ADMIN_WS_URI, WORKSPACE, mf.newChildTopicsModel()
+                .set(WORKSPACE_NAME, LQ.LINQA_ADMIN_WS_NAME)
+                .set(WORKSPACE_NAME + "#" + ZW.DE, LQ.LINQA_ADMIN_WS_NAME)
+            )
+        );
         // Bilingual topics
         retypeBilingualTopics("note");
         retypeBilingualTopics("textblock");

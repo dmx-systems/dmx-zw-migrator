@@ -19,10 +19,10 @@
     </parent>
 
     <dependencies>
-        <!--dependency>
+        <dependency>
             <groupId>systems.dmx</groupId>
-            <artifactId>dmx-zukunftswerk</artifactId>
-            <version>1.6.2</version>
-        </dependency-->
+            <artifactId>dmx-workspaces</artifactId>
+            <version>5.3.4-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
