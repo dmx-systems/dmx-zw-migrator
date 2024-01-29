@@ -44,12 +44,13 @@ public class Migration2 extends Migration {
         retypeTopics("language");
         retypeTopics("translation_edited");
         retypeTopics("locked");
+        retypeAssocs("shared_workspace");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void retypeBilingualTopics(String item) {
-        for (Topic topic : dmx.getTopicsByType("zukunftswerk." + item)) {
+        dmx.getTopicsByType("zukunftswerk." + item).stream().forEach(topic -> {
             ChildTopics ct = topic.getChildTopics();
             // text
             RelatedTopic de = ct.getTopic("zukunftswerk." + item + ".de");
@@ -67,12 +68,14 @@ public class Migration2 extends Migration {
             }
             // retype composite
             topic.setTypeUri("linqa." + item);
-        }
+        });
     }
 
     private void retypeTopics(String item) {
-        for (Topic topic : dmx.getTopicsByType("zukunftswerk." + item)) {
-            topic.setTypeUri("linqa." + item);
-        }
+        dmx.getTopicsByType("zukunftswerk." + item).stream().forEach(topic -> topic.setTypeUri("linqa." + item));
+    }
+
+    private void retypeAssocs(String item) {
+        dmx.getAssocsByType("zukunftswerk." + item).stream().forEach(assoc -> assoc.setTypeUri("linqa." + item));
     }
 }
