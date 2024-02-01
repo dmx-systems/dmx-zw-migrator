@@ -146,7 +146,9 @@ fi
 
 ## pull latest images (to keep versions up to date)
 docker compose --env-file "${ENV_FILE}" --file deploy/docker-compose.${DOCKER_COMPOSE_PROFILE}.yaml pull
-docker compose --env-file "${ENV_FILE}" --file deploy/docker-compose.${DOCKER_COMPOSE_PROFILE}.yaml up --force-recreate -d
+docker compose --env-file "${ENV_FILE}" --file deploy/docker-compose.${DOCKER_COMPOSE_PROFILE}.yaml up --force-recreate -d dmx || true
+docker compose --env-file "${ENV_FILE}" --file deploy/docker-compose.${DOCKER_COMPOSE_PROFILE}.yaml up --force-recreate -d dmxlog || true
+docker compose --env-file "${ENV_FILE}" --file deploy/docker-compose.${DOCKER_COMPOSE_PROFILE}.yaml up --force-recreate -d || true
 
 ## deploy containers
 test -d ./deploy/instance/${DOCKER_COMPOSE_PROFILE}/logs/ || echo "ERROR! Directory ./deploy/instance/${DOCKER_COMPOSE_PROFILE}/logs/ not found. Container up?"
