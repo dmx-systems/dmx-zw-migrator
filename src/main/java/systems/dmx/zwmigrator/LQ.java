@@ -12,7 +12,6 @@ public class LQ {
     public static final String DOCUMENT                 = "linqa.document";
     public static final String DOCUMENT_NAME            = "linqa.document_name";
     public static final String LINQA_NOTE               = "linqa.note"; // "NOTE" is already used by Notes module
-    public static final String LINQA_NOTE_TEXT          = "linqa.note_text";
     public static final String TEXTBLOCK                = "linqa.textblock";
     public static final String HEADING                  = "linqa.heading";
     public static final String ARROW                    = "linqa.arrow";
