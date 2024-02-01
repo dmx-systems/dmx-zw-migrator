@@ -1,0 +1,6 @@
+apk update
+apk add tesseract-ocr
+apk add tesseract-ocr-data-eng
+apk add tesseract-ocr-data-deu
+apk add tesseract-ocr-data-fra
+rm -rf /var/cache/apk/*
