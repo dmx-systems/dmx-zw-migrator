@@ -80,19 +80,19 @@ copy-to-release:
   only:
     - tags
 
-# 5) Deploy into gitlab maven repository
-deploy-to-gitlab-maven:
-  stage: deploy
-  tags:
-    - shell
-  #image: maven:3.6-jdk-11
-  script:
-    - 'mvn -Pgitlab-maven-deployment deploy -s ci_settings.xml'
-  only:
-    - master
-    - main
-    - dm4
-  allow_failure: true
+## 5) Deploy into gitlab maven repository
+#deploy-to-gitlab-maven:
+#  stage: deploy
+#  tags:
+#    - shell
+#  #image: maven:3.6-jdk-11
+#  script:
+#    - 'mvn -Pgitlab-maven-deployment deploy -s ci_settings.xml'
+#  only:
+#    - master
+#    - main
+#    - dm4
+# allow_failure: true
 
 
 # 6) Install in docker-container
