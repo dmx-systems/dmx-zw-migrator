@@ -105,8 +105,8 @@ install-in-container:
     - maven-build
   before_script:
     - if [ ! -d ./deploy/dmx/dev-ci/import ]; then mkdir ./deploy/dmx/dev-ci/import; fi
-    - curl -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/dmx-db.tar.gz" -o ./deploy/dmx/dev-ci/import/dmx-db.tar.gz
-    - curl -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/dmx-filedir.tar.gz" -o ./deploy/dmx/dev-ci/import/dmx-filedir.tar.gz
+    - 'curl -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/dmx-db.tar.gz" -o ./deploy/dmx/dev-ci/import/dmx-db.tar.gz'
+    - 'curl -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/dmx-filedir.tar.gz" -o ./deploy/dmx/dev-ci/import/dmx-filedir.tar.gz'
   script:
     - deploy/ci-deploy-docker-instances.sh
   rules:
