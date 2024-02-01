@@ -27,8 +27,8 @@ services:
     container_name: "${DEPLOY_PREFIX}-dmxlog-container"
     restart: unless-stopped
     image: container-registry.dmx.systems/dmx-intern/docker-images/busybox-httpd:latest
-    #links:
-    #  - dmx
+    links:
+      - dmx
     volumes:
       - ./instance/dev-ci/logs:/home/static/logs:ro
     ports:
