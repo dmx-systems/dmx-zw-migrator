@@ -81,24 +81,33 @@ public class Migration2 extends Migration {
 
     private void retypeBilingualTopics(String item) {
         dmx.getTopicsByType("zukunftswerk." + item).stream().forEach(topic -> {
-            ChildTopics ct = topic.getChildTopics();
             // text
-            RelatedTopic de = ct.getTopic("zukunftswerk." + item + ".de");
-            RelatedTopic fr = ct.getTopicOrNull("zukunftswerk." + item + ".fr");
-            de.setTypeUri("linqa." + item + "_text");
-            de.getRelatingAssoc().setTypeUri(LQ.LANG1);
+            RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + item + ".de");
+            RelatedTopic fr = getRelatedTopic(topic, "zukunftswerk." + item + ".fr");
+            logger.fine("-------> " + topic.getSimpleValue() + " (" + topic.getId() + ", " + (de != null) + ", " +
+                (fr != null) + ") \"" + wss.getAssignedWorkspace(topic.getId()).getSimpleValue() + "\"");
+            if (de != null) {
+                de.setTypeUri("linqa." + item + "_text");
+                de.getRelatingAssoc().setTypeUri(LQ.LANG1);
+            }
             if (fr != null) {
                 fr.setTypeUri("linqa." + item + "_text");
                 fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
             }
             // language
-            RelatedTopic origLang = ct.getTopicOrNull(ZW.LANGUAGE + "#" + ZW.ORIGINAL_LANGUAGE);
+            RelatedTopic origLang = topic.getChildTopics().getTopicOrNull(ZW.LANGUAGE + "#" + ZW.ORIGINAL_LANGUAGE);
             if (origLang != null) {
                 origLang.getRelatingAssoc().setTypeUri(LQ.ORIGINAL_LANGUAGE);
             }
             // retype composite
             topic.setTypeUri("linqa." + item);
         });
+    }
+
+    // Note: we can't use model-driven child topic access, in case of shared child topics it would fail.
+    // So we use manual DB navigation.
+    private RelatedTopic getRelatedTopic(Topic topic, String childTypeUri) {
+        return topic.getRelatedTopic(COMPOSITION, PARENT, CHILD, childTypeUri);
     }
 
     private void retypeTopics(String item) {
