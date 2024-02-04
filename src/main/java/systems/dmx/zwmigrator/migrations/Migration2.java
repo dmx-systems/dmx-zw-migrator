@@ -41,6 +41,7 @@ public class Migration2 extends Migration {
         //
         retypeBilingualTopics("note");
         retypeBilingualTopics("textblock");
+        retypeBilingualTopics("label", "heading");
         //
         retypeTopics("language");
         retypeTopics("translation_edited");
@@ -80,6 +81,10 @@ public class Migration2 extends Migration {
     }
 
     private void retypeBilingualTopics(String item) {
+        retypeBilingualTopics(item, item);
+    }
+
+    private void retypeBilingualTopics(String item, String targetItem) {
         dmx.getTopicsByType("zukunftswerk." + item).stream().forEach(topic -> {
             // text
             RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + item + ".de");
@@ -87,11 +92,11 @@ public class Migration2 extends Migration {
             logger.fine("-------> " + topic.getSimpleValue() + " (" + topic.getId() + ", " + (de != null) + ", " +
                 (fr != null) + ") \"" + wss.getAssignedWorkspace(topic.getId()).getSimpleValue() + "\"");
             if (de != null) {
-                de.setTypeUri("linqa." + item + "_text");
+                de.setTypeUri("linqa." + targetItem + "_text");
                 de.getRelatingAssoc().setTypeUri(LQ.LANG1);
             }
             if (fr != null) {
-                fr.setTypeUri("linqa." + item + "_text");
+                fr.setTypeUri("linqa." + targetItem + "_text");
                 fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
             }
             // language
@@ -100,7 +105,7 @@ public class Migration2 extends Migration {
                 origLang.getRelatingAssoc().setTypeUri(LQ.ORIGINAL_LANGUAGE);
             }
             // retype composite
-            topic.setTypeUri("linqa." + item);
+            topic.setTypeUri("linqa." + targetItem);
         });
     }
 
