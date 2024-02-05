@@ -47,6 +47,7 @@ public class Migration2 extends Migration {
         retypeBilingualTopics("label", null, "heading");
         //
         retypeTopics("arrow");
+        retypeTopics("viewport");
         retypeTopics("language");
         retypeTopics("translation_edited");
         retypeTopics("locked");
