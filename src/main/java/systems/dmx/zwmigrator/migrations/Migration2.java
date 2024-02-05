@@ -39,9 +39,10 @@ public class Migration2 extends Migration {
     public void run() {
         transformProperties();
         //
+        retypeBilingualTopics("document", "document_name", null);
         retypeBilingualTopics("note");
         retypeBilingualTopics("textblock");
-        retypeBilingualTopics("label", "heading");
+        retypeBilingualTopics("label", null, "heading");
         //
         retypeTopics("arrow");
         retypeTopics("language");
@@ -82,22 +83,32 @@ public class Migration2 extends Migration {
     }
 
     private void retypeBilingualTopics(String item) {
-        retypeBilingualTopics(item, item);
+        retypeBilingualTopics(item, null, null);
     }
 
-    private void retypeBilingualTopics(String item, String targetItem) {
+    /**
+     * @param   item        URI fragment (mandatory)
+     * @param   biItem      URI fragment (optional, may be null), used in 2 contexts:
+     *                      1) accessing the bilingual child value. If null "item" is used.
+     *                      2) calculating the target type of the bilingual child value.
+     *                         If null "item" or "targetItem" (if given) is used, appended by "_text".
+     */
+    private void retypeBilingualTopics(String item, String biItem, String targetItem) {
         dmx.getTopicsByType("zukunftswerk." + item).stream().forEach(topic -> {
             // text
-            RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + item + ".de");
-            RelatedTopic fr = getRelatedTopic(topic, "zukunftswerk." + item + ".fr");
+            String _biItem = biItem != null ? biItem : item;
+            RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".de");
+            RelatedTopic fr = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".fr");
             logger.fine("-------> " + topic.getSimpleValue() + " (" + topic.getId() + ", " + (de != null) + ", " +
                 (fr != null) + ") \"" + wss.getAssignedWorkspace(topic.getId()).getSimpleValue() + "\"");
+            String _targetBiItem = "linqa." + (biItem != null ? biItem :
+                                              (targetItem != null ? targetItem : item) + "_text");
             if (de != null) {
-                de.setTypeUri("linqa." + targetItem + "_text");
+                de.setTypeUri(_targetBiItem);
                 de.getRelatingAssoc().setTypeUri(LQ.LANG1);
             }
             if (fr != null) {
-                fr.setTypeUri("linqa." + targetItem + "_text");
+                fr.setTypeUri(_targetBiItem);
                 fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
             }
             // language
@@ -106,7 +117,8 @@ public class Migration2 extends Migration {
                 origLang.getRelatingAssoc().setTypeUri(LQ.ORIGINAL_LANGUAGE);
             }
             // retype composite
-            topic.setTypeUri("linqa." + targetItem);
+            String _targetItem = targetItem != null ? targetItem : item;
+            topic.setTypeUri("linqa." + _targetItem);
         });
     }
 
