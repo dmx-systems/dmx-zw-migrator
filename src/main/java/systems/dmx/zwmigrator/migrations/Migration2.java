@@ -43,6 +43,7 @@ public class Migration2 extends Migration {
         retypeBilingualTopics("textblock");
         retypeBilingualTopics("label", "heading");
         //
+        retypeTopics("arrow");
         retypeTopics("language");
         retypeTopics("translation_edited");
         retypeTopics("locked");
