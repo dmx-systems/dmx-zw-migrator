@@ -3,6 +3,7 @@ package systems.dmx.zwmigrator.migrations;
 import static systems.dmx.core.Constants.*;
 import static systems.dmx.topicmaps.Constants.*;
 import static systems.dmx.workspaces.Constants.*;
+import static systems.dmx.files.Constants.*;
 import systems.dmx.core.Assoc;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.RelatedTopic;
@@ -38,6 +39,7 @@ public class Migration2 extends Migration {
     @Override
     public void run() {
         transformProperties();
+        transformDocumentRefs();
         //
         retypeBilingualTopics("document", "document_name", null);
         retypeBilingualTopics("note");
@@ -79,6 +81,20 @@ public class Migration2 extends Migration {
                     assoc.removeProperty(ZW.ANGLE);
                 }
             });
+        });
+    }
+
+    private void transformDocumentRefs() {
+        dmx.getTopicsByType(ZW.DOCUMENT).stream().forEach(topic -> {
+            ChildTopics ct = topic.getChildTopics();
+            RelatedTopic de = ct.getTopicOrNull(FILE + "#" + ZW.DE);
+            RelatedTopic fr = ct.getTopicOrNull(FILE + "#" + ZW.FR);
+            if (de != null) {
+                de.getRelatingAssoc().setTypeUri(LQ.LANG1);
+            }
+            if (fr != null) {
+                fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
+            }
         });
     }
 
