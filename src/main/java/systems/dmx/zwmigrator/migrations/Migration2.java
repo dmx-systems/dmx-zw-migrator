@@ -52,6 +52,8 @@ public class Migration2 extends Migration {
         retypeTopics("language");
         retypeTopics("translation_edited");
         retypeTopics("locked");
+        //
+        retypeAssocs("attachment");
         retypeAssocs("shared_workspace");
         //
         transformWorkspaces();
