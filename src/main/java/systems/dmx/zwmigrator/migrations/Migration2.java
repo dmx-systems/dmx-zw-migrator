@@ -41,6 +41,7 @@ public class Migration2 extends Migration {
         transformProperties();
         transformDocumentRefs();
         //
+        retypeBilingualTopics("comment");
         retypeBilingualTopics("document", "document_name", null);
         retypeBilingualTopics("note");
         retypeBilingualTopics("textblock");
