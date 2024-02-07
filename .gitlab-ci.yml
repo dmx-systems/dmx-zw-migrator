@@ -106,9 +106,12 @@ install-in-container:
   before_script:
     - if [ ! -d ./deploy/dmx/dev-ci/import ]; then mkdir ./deploy/dmx/dev-ci/import; fi
     - if [ ! -d ./deploy/dmx/dev-ci/run.d ]; then mkdir ./deploy/dmx/dev-ci/run.d; fi
+    - 'curl -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/ldap-db.tar.gz" -o ./deploy/ldap/ldap-db.tar.gz'
+    - 'curl -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/ldap-cfg.tar.gz" -o ./deploy/ldap/ldap-cfg.tar.gz'
     - 'curl -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/dmx-db.tar.gz" -o ./deploy/dmx/dev-ci/import/dmx-db.tar.gz'
     - 'curl -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/dmx-filedir.tar.gz" -o ./deploy/dmx/dev-ci/import/dmx-filedir.tar.gz'
   script:
+    - deploy/ci-deploy-ldap-data.sh
     - deploy/ci-deploy-docker-instances.sh
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
