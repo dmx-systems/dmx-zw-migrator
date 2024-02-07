@@ -53,13 +53,12 @@ public class Migration2 extends Migration {
         retypeTopics("translation_edited");
         retypeTopics("locked");
         //
-        retypeAssocs("attachment");
         retypeAssocs("shared_workspace");
+        retypeAssocs("attachment");
+        retypeAssocs("original_language");
         //
         transformWorkspaces();
         transformPluginTopic();
-        //
-        // throw new RuntimeException("SUCCESS!");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -130,11 +129,6 @@ public class Migration2 extends Migration {
             if (fr != null) {
                 fr.setTypeUri(_targetBiItem);
                 fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
-            }
-            // language
-            RelatedTopic origLang = topic.getChildTopics().getTopicOrNull(ZW.LANGUAGE + "#" + ZW.ORIGINAL_LANGUAGE);
-            if (origLang != null) {
-                origLang.getRelatingAssoc().setTypeUri(LQ.ORIGINAL_LANGUAGE);
             }
             // retype composite
             String _targetItem = targetItem != null ? targetItem : item;
