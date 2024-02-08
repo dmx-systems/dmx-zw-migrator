@@ -41,13 +41,13 @@ public class Migration2 extends Migration {
         transformProperties();
         transformDocumentRefs();
         //
-        retypeBilingualTopics("comment");
-        retypeBilingualTopics("document", "document_name", null);
-        retypeBilingualTopics("note");
-        retypeBilingualTopics("textblock");
-        retypeBilingualTopics("label", null, "heading");
+        long comments   = retypeBilingualTopics("comment");
+        long documents  = retypeBilingualTopics("document", "document_name", null);
+        long notes      = retypeBilingualTopics("note");
+        long textblocks = retypeBilingualTopics("textblock");
+        long headings   = retypeBilingualTopics("label", null, "heading");
         //
-        retypeTopics("arrow");
+        long arrows = retypeTopics("arrow");
         retypeTopics("viewport");
         retypeTopics("language");
         retypeTopics("translation_edited");
@@ -57,8 +57,18 @@ public class Migration2 extends Migration {
         retypeAssocs("attachment");
         retypeAssocs("original_language");
         //
-        transformWorkspaces();
+        long workspaces = transformWorkspaces();
         transformPluginTopic();
+        //
+        logger.info("##### ZW->Linqa migration complete #####\n  " +
+            "Workspaces: " + workspaces + "\n  " +
+            "Comments: "   + comments + "\n  " +
+            "Documents: "  + documents + "\n  " +
+            "Notes: "      + notes + "\n  " +
+            "Textblocks: " + textblocks + "\n  " +
+            "Headings: "   + headings + "\n  " +
+            "Arrows: "     + arrows
+        );
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -101,8 +111,8 @@ public class Migration2 extends Migration {
         });
     }
 
-    private void retypeBilingualTopics(String item) {
-        retypeBilingualTopics(item, null, null);
+    private long retypeBilingualTopics(String item) {
+        return retypeBilingualTopics(item, null, null);
     }
 
     /**
@@ -112,8 +122,8 @@ public class Migration2 extends Migration {
      *                      2) calculating the target type of the bilingual child value.
      *                         If null "item" or "targetItem" (if given) is used, appended by "_text".
      */
-    private void retypeBilingualTopics(String item, String biItem, String targetItem) {
-        dmx.getTopicsByType("zukunftswerk." + item).stream().forEach(topic -> {
+    private long retypeBilingualTopics(String item, String biItem, String targetItem) {
+        return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
             // text
             String _biItem = biItem != null ? biItem : item;
             RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".de");
@@ -133,7 +143,8 @@ public class Migration2 extends Migration {
             // retype composite
             String _targetItem = targetItem != null ? targetItem : item;
             topic.setTypeUri("linqa." + _targetItem);
-        });
+            return true;
+        }).count();
     }
 
     // Note: we can't use model-driven child topic access, in case of shared child topics it would fail.
@@ -142,17 +153,23 @@ public class Migration2 extends Migration {
         return topic.getRelatedTopic(COMPOSITION, PARENT, CHILD, childTypeUri);
     }
 
-    private void retypeTopics(String item) {
-        dmx.getTopicsByType("zukunftswerk." + item).stream().forEach(topic -> topic.setTypeUri("linqa." + item));
+    private long retypeTopics(String item) {
+        return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
+            topic.setTypeUri("linqa." + item);
+            return true;
+        }).count();
     }
 
-    private void retypeAssocs(String item) {
-        dmx.getAssocsByType("zukunftswerk." + item).stream().forEach(assoc -> assoc.setTypeUri("linqa." + item));
+    private long retypeAssocs(String item) {
+        return dmx.getAssocsByType("zukunftswerk." + item).stream().filter(assoc -> {
+            assoc.setTypeUri("linqa." + item);
+            return true;
+        }).count();
     }
 
-    private void transformWorkspaces() {
+    private long transformWorkspaces() {
         // Workspace names
-        forAllWorkspaces(this::transformWorkspaceName);
+        long count = forAllWorkspaces(this::transformWorkspaceName);
         // "Workspace Name" type def
         TopicType type = dmx.getTopicType(WORKSPACE);
         String compDefUri = ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE;
@@ -165,6 +182,7 @@ public class Migration2 extends Migration {
                 .set(WORKSPACE_NAME + "#" + ZW.DE, LQ.LINQA_ADMIN_WS_NAME)
             )
         );
+        return count;
     }
 
     private void transformWorkspaceName(Topic ws) {
@@ -179,9 +197,12 @@ public class Migration2 extends Migration {
         }
     }
 
-    private void forAllWorkspaces(Consumer<Topic> consumer) {
+    private long forAllWorkspaces(Consumer<Topic> consumer) {
         consumer.accept(dmx.getTopicByUri(ZW.TEAM_WORKSPACE_URI));
-        getAllZWWorkspaces().stream().forEach(consumer);
+        return getAllZWWorkspaces().stream().filter(ws -> {
+            consumer.accept(ws);
+            return true;
+        }).count() + 1;
     }
 
     private List<RelatedTopic> getAllZWWorkspaces() {
