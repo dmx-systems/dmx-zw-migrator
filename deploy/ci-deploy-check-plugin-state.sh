@@ -25,7 +25,10 @@
 #
 
 
+
+
 function check_state() {
+    SEARCH_STRING='INFO: ### Bundles total: 46, DMX plugins: 24, Activated: 24'
     LOGFILE="$1"
     NUMREGEX='^[0-9]+$'
     if [[ -n "$2" ]] && [[ "$2" =~ ${NUMREGEX} ]]; then
@@ -34,7 +37,7 @@ function check_state() {
         WAITSTART=180
     fi
     ## grep what we are we looking for
-    STARTS="$( cat ${LOGFILE} | grep -c "INFO: ### Bundles total: 46, DMX plugins: 24, Activated: 24" )"
+    STARTS="$( cat ${LOGFILE} | grep -c "${SEARCH_STRING}" )"
     if [ -z "${STARTS}" ]; then
         STARTS = 0
     fi
@@ -47,7 +50,7 @@ function check_state() {
     while [ "${STARTS}" -lt "${GOAL}" ] && [ "${COUNT}" -lt "${WAITSTART}" ]; do
     sleep 1
     COUNT=$(( ${COUNT} + 1 ))
-    STARTS="$( cat ${LOGFILE} | grep -c "INFO: DMX plugin started in" )"
+    STARTS="$( cat ${LOGFILE} | grep -c "${SEARCH_STRING}" )"
     ERRORS="$( cat ${LOGFILE} | grep -c "SEVERE: " )"
     ERRORS=$(( ${ERRORS} - ${OLDERRORS} ))
     if [ ${ERRORS} -gt 0 ]; then
