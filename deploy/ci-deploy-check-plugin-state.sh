@@ -66,10 +66,10 @@ function check_state() {
 
     ## report status
     if [ "${STARTS}" -lt "${GOAL}" ]; then
-    echo "ERROR! Failed to start DMX in ${WAITSTART} seconds."
+    echo "ERROR! Failed to start DMX plugins in ${WAITSTART} seconds."
     exit 1
     else
-    STARTTIME="$( cat ${LOGFILE} | grep "INFO: DMX platform started in" | tail -n 1 )"
+    STARTTIME="$( cat ${LOGFILE} | grep "INFO: DMX plugins started in" | tail -n 1 )"
     echo "${STARTTIME} (COUNT=${COUNT})"
     echo "INFO: Success."
     fi
