@@ -51,11 +51,12 @@ if [ ! -f deploy/scripts/dmxstate.sh ]; then
 fi
 
 ## dmx plugins
+plugin_list='deploy/ci-deploy-plugins.list'
 test -d deploy/dmx/${DOCKER_COMPOSE_PROFILE}/plugins || mkdir deploy/dmx/${DOCKER_COMPOSE_PROFILE}/plugins
-if [ -f deploy/ci-deploy-plugins.list ];  then 
+if [ -f ${plugin_list} ];  then 
     ## remove (ignore) existing plugins
     find deploy/dmx/${DOCKER_COMPOSE_PROFILE}/plugins/ -type f -name "*.jar" -delete
-    PLUGINS="$(<deploy/ci-deploy-plugins.list)"
+    PLUGINS="$(<${plugin_list})"
     declare -a PLUGINS=(${PLUGINS})
 else 
     declare -a PLUGINS=()
@@ -84,8 +85,8 @@ if [ -z "${DMX_PORT}" ]; then
 fi
 sleep 1
 LOGS_PORT="$( get_port.sh ${WEB_URL}-log )"
-if [ "$( echo "${PLUGINS[@]}" | grep dmx-sendmail )" ] || [ "$( echo "${target}" | grep dmx-sendmail )" ] \
-    || [ -f deploy/dmx/ci-deploy-plugins.list -a "$( cat deploy/dmx/ci-deploy-plugins.list | grep dmx-sendmail )" ]; then
+if [ "$( echo "${PLUGINS[@]}" | grep dmx-sendmail )" ] || [ "$( echo "${target}" | grep dmx-sendmail )" ]; then
+    # || [ -f ${plugin_list} -a "$( cat ${plugin_list} | grep dmx-sendmail )" ]; then
     MAIL_PORT="$( get_port.sh ${WEB_URL}-mail )"
     echo "MAIL_PORT=${MAIL_PORT}" >>"${ENV_FILE}"
 else
