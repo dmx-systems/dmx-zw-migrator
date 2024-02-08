@@ -113,6 +113,7 @@ install-in-container:
   script:
     - deploy/ci-deploy-ldap-files.sh
     - deploy/ci-deploy-docker-instances.sh
+    - deploy/ci-deploy-check-plugin-state.sh ./deploy/instance/${DOCKER_COMPOSE_PROFILE}/logs/dmx0.log 180
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TAG == null
