@@ -15,3 +15,7 @@ if [ -f deploy/ldap/ldap-db.tar.gz ]; then
     tar -xzvf deploy/ldap/ldap-db.tar.gz -C deploy/ldap/
     rm deploy/ldap/ldap-db.tar.gz
 fi
+
+chmod 600 deploy/ldap/certs/dhparam.pem
+chmod 644 deploy/ldap/certs/ldap.crt
+chmod 600 deploy/ldap/certs/ldap.key
