@@ -53,14 +53,13 @@ public class Migration2 extends Migration {
         retypeAssocs("shared_workspace");
         retypeAssocs("attachment");
         retypeAssocs("original_language");
+        retypeAssocs("de", "lang1");
+        retypeAssocs("fr", "lang2");
         //
         long workspaces = transformProperties();
         transformTeamWorkspace();
         transformWorkspaceModel();
         transformPluginTopic();
-        //
-        retypeAssocs("de", "lang1");
-        retypeAssocs("fr", "lang2");
         //
         logger.info("##### ZW->Linqa migration complete #####\n  " +
             "Workspaces: " + workspaces + "\n  " +
@@ -171,13 +170,7 @@ public class Migration2 extends Migration {
     }
 
     private void transformTeamWorkspace() {
-        // "Team" workspace: rename + change URI            // FIXME: do renaming actually?
-        dmx.getTopicByUri(ZW.TEAM_WORKSPACE_URI).update(
-            mf.newTopicModel(LQ.LINQA_ADMIN_WS_URI, WORKSPACE, mf.newChildTopicsModel()
-                .set(WORKSPACE_NAME, LQ.LINQA_ADMIN_WS_NAME)
-                .set(WORKSPACE_NAME + "#" + ZW.DE, LQ.LINQA_ADMIN_WS_NAME)
-            )
-        );
+        dmx.getTopicByUri(ZW.TEAM_WORKSPACE_URI).setUri(LQ.LINQA_ADMIN_WS_URI);
     }
 
     private void transformWorkspaceModel() {
