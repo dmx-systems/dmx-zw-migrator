@@ -27,7 +27,8 @@ services:
   ldap:
     container_name: "${DEPLOY_PREFIX}-ldap-container"
     restart: unless-stopped
-    command: "--copy-service --loglevel debug"
+    #command: "--copy-service --loglevel debug"
+    command: "--copy-service"
     build:
       context: "./ldap/${TIER}-ci"
     environment:
