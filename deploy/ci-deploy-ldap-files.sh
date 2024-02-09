@@ -19,4 +19,4 @@ fi
 chmod 600 deploy/ldap/certs/dhparam.pem
 chmod 644 deploy/ldap/certs/ldap.crt
 chmod 600 deploy/ldap/certs/ldap.key
-chmod 664 deploy/ldap/carts/ca.crt
+chmod 664 deploy/ldap/certs/ca.crt
