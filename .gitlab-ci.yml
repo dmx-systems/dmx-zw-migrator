@@ -112,6 +112,7 @@ install-in-container:
     - 'curl -sS -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/dmx-filedir.tar.gz" -o ./deploy/dmx/dev-ci/import/dmx-filedir.tar.gz'
   script:
     - deploy/ci-deploy-ldap-files.sh
+    - tree -ug deploy/ldap/
     - deploy/ci-deploy-docker-instances.sh
     - deploy/ci-deploy-check-plugin-state.sh ./deploy/instance/dev-ci/logs/dmx0.log 180
   rules:
