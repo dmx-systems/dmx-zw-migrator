@@ -38,9 +38,6 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        transformProperties();
-        transformDocumentRefs();
-        //
         long comments   = retypeBilingualTopics("comment");
         long documents  = retypeBilingualTopics("document", "document_name", null);
         long notes      = retypeBilingualTopics("note");
@@ -57,8 +54,13 @@ public class Migration2 extends Migration {
         retypeAssocs("attachment");
         retypeAssocs("original_language");
         //
-        long workspaces = transformWorkspaces();
+        long workspaces = transformProperties();
+        transformTeamWorkspace();
+        transformWorkspaceModel();
         transformPluginTopic();
+        //
+        retypeAssocs("de", "lang1");
+        retypeAssocs("fr", "lang2");
         //
         logger.info("##### ZW->Linqa migration complete #####\n  " +
             "Workspaces: " + workspaces + "\n  " +
@@ -73,44 +75,6 @@ public class Migration2 extends Migration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void transformProperties() {
-        forAllWorkspaces(ws -> {
-            String wsName = ws.getSimpleValue().toString();
-            logger.info("---------------- \"" + wsName + "\" ----------------");
-            List<Topic> topicmaps = wss.getAssignedTopics(ws.getId(), TOPICMAP);
-            if (topicmaps.size() != 1) {
-                throw new RuntimeException("Workspace " + ws.getId() + " has " + topicmaps.size() +
-                    " topicmaps, expected is 1");
-            }
-            Topic topicmap = topicmaps.get(0);                                     // othersTopicTypeUri=null
-            topicmap.getRelatedTopics(TOPICMAP_CONTEXT, DEFAULT, TOPICMAP_CONTENT, null).stream().forEach(topic -> {
-                Assoc assoc = topic.getRelatingAssoc();
-                if (assoc.hasProperty(ZW.ZW_COLOR)) {      // Color is an optional view prop
-                    assoc.setProperty(LQ.LINQA_COLOR, assoc.getProperty(ZW.ZW_COLOR), false);   // addToIndex=false
-                    assoc.removeProperty(ZW.ZW_COLOR);
-                }
-                if (assoc.hasProperty(ZW.ANGLE)) {         // Angle is an optional view prop
-                    assoc.setProperty(LQ.ANGLE, assoc.getProperty(ZW.ANGLE), false);            // addToIndex=false
-                    assoc.removeProperty(ZW.ANGLE);
-                }
-            });
-        });
-    }
-
-    private void transformDocumentRefs() {
-        dmx.getTopicsByType(ZW.DOCUMENT).stream().forEach(topic -> {
-            ChildTopics ct = topic.getChildTopics();
-            RelatedTopic de = ct.getTopicOrNull(FILE + "#" + ZW.DE);
-            RelatedTopic fr = ct.getTopicOrNull(FILE + "#" + ZW.FR);
-            if (de != null) {
-                de.getRelatingAssoc().setTypeUri(LQ.LANG1);
-            }
-            if (fr != null) {
-                fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
-            }
-        });
-    }
-
     private long retypeBilingualTopics(String item) {
         return retypeBilingualTopics(item, null, null);
     }
@@ -124,12 +88,10 @@ public class Migration2 extends Migration {
      */
     private long retypeBilingualTopics(String item, String biItem, String targetItem) {
         return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
-            // text
+            // bilingual text
             String _biItem = biItem != null ? biItem : item;
             RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".de");
             RelatedTopic fr = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".fr");
-            logger.fine("-------> " + topic.getSimpleValue() + " (" + topic.getId() + ", " + (de != null) + ", " +
-                (fr != null) + ") \"" + wss.getAssignedWorkspace(topic.getId()).getSimpleValue() + "\"");
             String _targetBiItem = "linqa." + (biItem != null ? biItem :
                                               (targetItem != null ? targetItem : item) + "_text");
             if (de != null) {
@@ -161,40 +123,39 @@ public class Migration2 extends Migration {
     }
 
     private long retypeAssocs(String item) {
+        return retypeAssocs(item, null);
+    }
+
+    private long retypeAssocs(String item, String targetItem) {
+        String typeUri = "linqa." + (targetItem != null ? targetItem : item);
         return dmx.getAssocsByType("zukunftswerk." + item).stream().filter(assoc -> {
-            assoc.setTypeUri("linqa." + item);
+            assoc.setTypeUri(typeUri);
             return true;
         }).count();
     }
 
-    private long transformWorkspaces() {
-        // Workspace names
-        long count = forAllWorkspaces(this::transformWorkspaceName);
-        // "Workspace Name" type def
-        TopicType type = dmx.getTopicType(WORKSPACE);
-        String compDefUri = ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE;
-        type.getCompDef(WORKSPACE_NAME + "#" + ZW.DE).update(mf.newChildTopicsModel().setRef(compDefUri, LQ.LANG1));
-        type.getCompDef(WORKSPACE_NAME + "#" + ZW.FR).update(mf.newChildTopicsModel().setRef(compDefUri, LQ.LANG2));
-        // "Team" workspace: rename + change URI            // FIXME: do renaming actually?
-        dmx.getTopicByUri(ZW.TEAM_WORKSPACE_URI).update(
-            mf.newTopicModel(LQ.LINQA_ADMIN_WS_URI, WORKSPACE, mf.newChildTopicsModel()
-                .set(WORKSPACE_NAME, LQ.LINQA_ADMIN_WS_NAME)
-                .set(WORKSPACE_NAME + "#" + ZW.DE, LQ.LINQA_ADMIN_WS_NAME)
-            )
-        );
-        return count;
-    }
-
-    private void transformWorkspaceName(Topic ws) {
-        ChildTopics ct = ws.getChildTopics();
-        RelatedTopic de = ct.getTopicOrNull(WORKSPACE_NAME + "#" + ZW.DE);
-        RelatedTopic fr = ct.getTopicOrNull(WORKSPACE_NAME + "#" + ZW.FR);
-        if (de != null) {
-            de.getRelatingAssoc().setTypeUri(LQ.LANG1);
-        }
-        if (fr != null) {
-            fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
-        }
+    private long transformProperties() {
+        return forAllWorkspaces(ws -> {
+            String wsName = ws.getSimpleValue().toString();
+            logger.info("---------------- \"" + wsName + "\" ----------------");
+            List<Topic> topicmaps = wss.getAssignedTopics(ws.getId(), TOPICMAP);
+            if (topicmaps.size() != 1) {
+                throw new RuntimeException("Workspace " + ws.getId() + " has " + topicmaps.size() +
+                    " topicmaps, expected is 1");
+            }
+            Topic topicmap = topicmaps.get(0);                                     // othersTopicTypeUri=null
+            topicmap.getRelatedTopics(TOPICMAP_CONTEXT, DEFAULT, TOPICMAP_CONTENT, null).stream().forEach(topic -> {
+                Assoc assoc = topic.getRelatingAssoc();
+                if (assoc.hasProperty(ZW.ZW_COLOR)) {      // Color is an optional view prop
+                    assoc.setProperty(LQ.LINQA_COLOR, assoc.getProperty(ZW.ZW_COLOR), false);   // addToIndex=false
+                    assoc.removeProperty(ZW.ZW_COLOR);
+                }
+                if (assoc.hasProperty(ZW.ANGLE)) {         // Angle is an optional view prop
+                    assoc.setProperty(LQ.ANGLE, assoc.getProperty(ZW.ANGLE), false);            // addToIndex=false
+                    assoc.removeProperty(ZW.ANGLE);
+                }
+            });
+        });
     }
 
     private long forAllWorkspaces(Consumer<Topic> consumer) {
@@ -207,6 +168,24 @@ public class Migration2 extends Migration {
 
     private List<RelatedTopic> getAllZWWorkspaces() {
         return dmx.getTopicByUri(ZW.ZW_PLUGIN_URI).getRelatedTopics(ZW.SHARED_WORKSPACE, DEFAULT, DEFAULT, WORKSPACE);
+    }
+
+    private void transformTeamWorkspace() {
+        // "Team" workspace: rename + change URI            // FIXME: do renaming actually?
+        dmx.getTopicByUri(ZW.TEAM_WORKSPACE_URI).update(
+            mf.newTopicModel(LQ.LINQA_ADMIN_WS_URI, WORKSPACE, mf.newChildTopicsModel()
+                .set(WORKSPACE_NAME, LQ.LINQA_ADMIN_WS_NAME)
+                .set(WORKSPACE_NAME + "#" + ZW.DE, LQ.LINQA_ADMIN_WS_NAME)
+            )
+        );
+    }
+
+    private void transformWorkspaceModel() {
+        // "Workspace Name" type def
+        TopicType type = dmx.getTopicType(WORKSPACE);
+        String compDefUri = ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE;
+        type.getCompDef(WORKSPACE_NAME + "#" + ZW.DE).update(mf.newChildTopicsModel().setRef(compDefUri, LQ.LANG1));
+        type.getCompDef(WORKSPACE_NAME + "#" + ZW.FR).update(mf.newChildTopicsModel().setRef(compDefUri, LQ.LANG2));
     }
 
     private void transformPluginTopic() {
