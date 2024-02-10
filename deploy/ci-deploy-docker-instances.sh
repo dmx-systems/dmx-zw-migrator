@@ -95,6 +95,7 @@ else
 fi
 
 ## save docker environment vars to file
+echo "TIER=${TIER}" >>"${ENV_FILE}"
 echo "user_id=${USER_ID}" >>"${ENV_FILE}"
 echo "group_id=${GROUP_ID}" >>"${ENV_FILE}"
 echo "DMX_PORT=${DMX_PORT}" >>"${ENV_FILE}"
