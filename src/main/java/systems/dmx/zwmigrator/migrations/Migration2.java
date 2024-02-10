@@ -1,11 +1,12 @@
 package systems.dmx.zwmigrator.migrations;
 
+import static systems.dmx.accesscontrol.Constants.*;
 import static systems.dmx.core.Constants.*;
+import static systems.dmx.files.Constants.*;
 import static systems.dmx.topicmaps.Constants.*;
 import static systems.dmx.workspaces.Constants.*;
-import static systems.dmx.files.Constants.*;
 import systems.dmx.core.Assoc;
-import systems.dmx.core.ChildTopics;
+import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
@@ -58,6 +59,7 @@ public class Migration2 extends Migration {
         retypeAssocs("fr", "lang2");
         //
         long workspaces = transformProperties();
+        transformAdminProperties();
         transformTeamWorkspace();
         transformWorkspaceModel();
         transformPluginTopic();
@@ -146,14 +148,8 @@ public class Migration2 extends Migration {
             Topic topicmap = topicmaps.get(0);                                     // othersTopicTypeUri=null
             topicmap.getRelatedTopics(TOPICMAP_CONTEXT, DEFAULT, TOPICMAP_CONTENT, null).stream().forEach(topic -> {
                 Assoc assoc = topic.getRelatingAssoc();
-                if (assoc.hasProperty(ZW.ZW_COLOR)) {      // Color is an optional view prop
-                    assoc.setProperty(LQ.LINQA_COLOR, assoc.getProperty(ZW.ZW_COLOR), false);   // addToIndex=false
-                    assoc.removeProperty(ZW.ZW_COLOR);
-                }
-                if (assoc.hasProperty(ZW.ANGLE)) {         // Angle is an optional view prop
-                    assoc.setProperty(LQ.ANGLE, assoc.getProperty(ZW.ANGLE), false);            // addToIndex=false
-                    assoc.removeProperty(ZW.ANGLE);
-                }
+                transformProperty(assoc, ZW.ZW_COLOR, LQ.LINQA_COLOR);
+                transformProperty(assoc, ZW.ANGLE, LQ.ANGLE);
             });
         });
     }
@@ -168,6 +164,19 @@ public class Migration2 extends Migration {
 
     private List<RelatedTopic> getAllZWWorkspaces() {
         return dmx.getTopicByUri(ZW.ZW_PLUGIN_URI).getRelatedTopics(ZW.SHARED_WORKSPACE, DEFAULT, DEFAULT, WORKSPACE);
+    }
+
+    private void transformAdminProperties() {
+        dmx.getTopicsByType(USERNAME).stream().forEach(topic -> {
+            transformProperty(topic, ZW.USER_ACTIVE, LQ.USER_ACTIVE);
+        });
+    }
+
+    private void transformProperty(DMXObject object, String srcProp, String targetProp) {
+        if (object.hasProperty(srcProp)) {
+            object.setProperty(targetProp, object.getProperty(srcProp), false);    // addToIndex=false
+            object.removeProperty(srcProp);
+        }
     }
 
     private void transformTeamWorkspace() {
