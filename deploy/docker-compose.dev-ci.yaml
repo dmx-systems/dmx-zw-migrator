@@ -41,7 +41,7 @@ services:
     volumes:
       - ./ldap/ldap-db:/var/lib/ldap
       - ./ldap/ldap-cfg:/etc/ldap/slapd.d
-      - ./ldap/certs:/container/service/slapd/assets/certs:ro
+      # - ./ldap/certs:/container/service/slapd/assets/certs:ro
 
 
   mailhog:
