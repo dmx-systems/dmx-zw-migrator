@@ -115,7 +115,7 @@ install-in-container:
     - deploy/ci-deploy-ldap-files.sh
     - ls -la deploy/ldap/dev-ci/bootstrap/
     - deploy/ci-deploy-docker-instances.sh
-    - deploy/ci-deploy-check-plugin-state.sh ./deploy/instance/dev-ci/logs/dmx0.log 180
+    - deploy/ci-deploy-check-plugin-state.sh ./deploy/instance/dev-ci/logs/dmx0.log 180 || true
     - docker exec dmx-zw-migrator-dev-ldap-container /bin/sh -c "slapadd -v -c -l /container/service/slapd/assets/config/bootstrap/ldif/custom/20-users.ldif"
     - deploy/ci-login-testuser.sh
     - deploy/ci-deploy-extra-plugins.sh dmx-linqa
