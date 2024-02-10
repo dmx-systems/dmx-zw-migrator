@@ -27,7 +27,7 @@ fi
 ## export HOST for subsequent scripts
 export HOST="https://${WEB_URL}:443"
 ## Test access to Administration workspace to ensure login as admin was successful.
-URL='core/topic/uri/dmx.workspaces.administration'
+URL='access-control/user/workspace'
 BASE64="$( echo -n "${USERNAME}:${PASSWORD}" | base64 )"
 AUTH="Authorization: ${AUTHTYPE} ${BASE64}"
 SESSION="$( curl -sS -H "${AUTH}" "${HOST}/${URL}" -i 2>&1 )"
