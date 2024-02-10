@@ -116,7 +116,7 @@ install-in-container:
     - ls -la deploy/ldap/dev-ci/bootstrap/
     - deploy/ci-deploy-docker-instances.sh
     - deploy/ci-deploy-check-plugin-state.sh ./deploy/instance/dev-ci/logs/dmx0.log 180
-    - docker exec dmx-zw-migrator-dev-ldap-container /bin/sh -c "slapadd -v -l /container/service/slapd/assets/config/bootstrap/ldif/custom/20-users.ldif"
+    - docker exec dmx-zw-migrator-dev-ldap-container /bin/sh -c "slapadd -v -c -l /container/service/slapd/assets/config/bootstrap/ldif/custom/20-users.ldif"
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == 'main' && $CI_COMMIT_TAG == null
