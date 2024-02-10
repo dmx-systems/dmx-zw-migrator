@@ -8,7 +8,7 @@
 ## always sleep at least for 3s
 sleep 3
 
-source ./ci-deploy-vars.sh
+source deploy/ci-deploy-vars.sh
 
 ## requires vars should be pre-set via environment
 USERNAME='testuser@example.org'
