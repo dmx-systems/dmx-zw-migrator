@@ -110,6 +110,7 @@ install-in-container:
     - 'curl -sS -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/ldap-cfg.tar.gz" -o ./deploy/ldap/ldap-cfg.tar.gz'
     - 'curl -sS -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/dmx-db.tar.gz" -o ./deploy/dmx/dev-ci/import/dmx-db.tar.gz'
     - 'curl -sS -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/dmx-filedir.tar.gz" -o ./deploy/dmx/dev-ci/import/dmx-filedir.tar.gz'
+    - 'curl -sS -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/20-users.ldif" -o ./deploy/ldap/dev-ci/bootstrap/20-users.ldif'
   script:
     - deploy/ci-deploy-ldap-files.sh
     #- ls -la deploy/ldap/certs/

@@ -1,0 +1,11 @@
+dn: cn=zukunftswerk_users,dc=zukunftswerk,dc=org
+objectClass: groupOfNames
+cn: zukunftswerk_users
+description: Zukunftswerk Users
+member: uid=dummy_user,ou=users,dc=zukunftswerk,dc=org
+
+dn: cn=nextcloud_users,dc=zukunftswerk,dc=org
+objectClass: groupOfNames
+cn: nextcloud_users
+description: Nextcloud Users
+member: uid=dummy_user,ou=users,dc=zukunftswerk,dc=org

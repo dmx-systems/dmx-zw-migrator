@@ -1,4 +1,4 @@
-dn: ou=users,dc=example,dc=org
+dn: ou=users,dc=zukunftswerk,dc=org
 objectClass: organizationalUnit
 ou: users
 

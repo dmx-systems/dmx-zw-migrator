@@ -28,10 +28,11 @@ services:
     container_name: "${DEPLOY_PREFIX}-ldap-container"
     restart: unless-stopped
     command: "--copy-service --loglevel debug"
-    #command: ["--loglevel debug"]
     build:
-      context: "./ldap/${TIER}-ci"
+      context: ./ldap/${TIER}-ci
     environment:
+      LDAP_ORGANISATION: "zukunftswerk"
+      LDAP_DOMAIN: "zukunftswerk.org"
       LDAP_OPENLDAP_UID: "${user_id}"
       LDAP_OPENLDAP_GID: "${group_id}"
       LDAP_TLS: "false"
@@ -41,7 +42,6 @@ services:
     volumes:
       - ./ldap/ldap-db:/var/lib/ldap
       - ./ldap/ldap-cfg:/etc/ldap/slapd.d
-      # - ./ldap/certs:/container/service/slapd/assets/certs:ro
 
 
   mailhog:
