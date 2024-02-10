@@ -113,7 +113,7 @@ install-in-container:
     - 'curl -sS -u "${OC_ACCESS_TOKEN}:${OC_ACCESS_PW}" -H "X-Requested-With: XMLHttpRequest" "https://files.dmx.systems/public.php/webdav/20-users.ldif" -o ./deploy/ldap/dev-ci/bootstrap/20-users.ldif'
   script:
     - deploy/ci-deploy-ldap-files.sh
-    #- ls -la deploy/ldap/certs/
+    - ls -la deploy/ldap/dev-ci/bootstrap/
     - deploy/ci-deploy-docker-instances.sh
     - deploy/ci-deploy-check-plugin-state.sh ./deploy/instance/dev-ci/logs/dmx0.log 180
   rules:
