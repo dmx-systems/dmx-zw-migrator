@@ -10,10 +10,17 @@ public class ZW {
 
     // Topic Types
     public static final String DOCUMENT                 = "zukunftswerk.document";
-    public static final String DOCUMENT_NAME            = "zukunftswerk.document_name";
+    public static final String DOCUMENT_NAME_DE         = "zukunftswerk.document_name.de";
+    public static final String DOCUMENT_NAME_FR         = "zukunftswerk.document_name.fr";
     public static final String ZW_NOTE                  = "zukunftswerk.note"; // "NOTE" is already used by Notes module
+    public static final String ZW_NOTE_DE               = "zukunftswerk.note.de";
+    public static final String ZW_NOTE_FR               = "zukunftswerk.note.fr";
     public static final String TEXTBLOCK                = "zukunftswerk.textblock";
+    public static final String TEXTBLOCK_DE             = "zukunftswerk.textblock.de";
+    public static final String TEXTBLOCK_FR             = "zukunftswerk.textblock.fr";
     public static final String LABEL                    = "zukunftswerk.label";
+    public static final String LABEL_DE                 = "zukunftswerk.label.de";
+    public static final String LABEL_FR                 = "zukunftswerk.label.fr";
     public static final String ARROW                    = "zukunftswerk.arrow";
     public static final String COMMENT                  = "zukunftswerk.comment";
     public static final String COMMENT_DE               = "zukunftswerk.comment.de";

@@ -10,5 +10,5 @@ public class ZWMigratorPlugin extends PluginActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    @Inject private WorkspacesService ws;
+    @Inject private WorkspacesService ws;       // needed by migration 2
 }

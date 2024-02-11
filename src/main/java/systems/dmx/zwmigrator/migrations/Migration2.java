@@ -65,6 +65,8 @@ public class Migration2 extends Migration {
         transformWorkspaceModel();
         transformPluginTopic();
         //
+        // deleteZukunftswerkModel();
+        //
         logger.info("##### ZW->Linqa migration complete #####\n  " +
             "Workspaces: " + workspaces + "\n  " +
             "Comments: "   + comments + "\n  " +
@@ -199,5 +201,39 @@ public class Migration2 extends Migration {
                 .set(PLUGIN_SYMBOLIC_NAME, LQ.LINQA_PLUGIN_URI)
                 .set(PLUGIN_MIGRATION_NR, 2)
         ));
+    }
+
+    private void deleteZukunftswerkModel() {
+        //
+        dmx.deleteTopicType(ZW.DOCUMENT);
+        dmx.deleteTopicType(ZW.DOCUMENT_NAME_DE);
+        dmx.deleteTopicType(ZW.DOCUMENT_NAME_FR);
+        dmx.deleteTopicType(ZW.ZW_NOTE);
+        dmx.deleteTopicType(ZW.ZW_NOTE_DE);
+        dmx.deleteTopicType(ZW.ZW_NOTE_FR);
+        dmx.deleteTopicType(ZW.TEXTBLOCK);
+        dmx.deleteTopicType(ZW.TEXTBLOCK_DE);
+        dmx.deleteTopicType(ZW.TEXTBLOCK_FR);
+        dmx.deleteTopicType(ZW.LABEL);
+        dmx.deleteTopicType(ZW.LABEL_DE);
+        dmx.deleteTopicType(ZW.LABEL_FR);
+        dmx.deleteTopicType(ZW.ARROW);
+        dmx.deleteTopicType(ZW.COMMENT);
+        dmx.deleteTopicType(ZW.COMMENT_DE);
+        dmx.deleteTopicType(ZW.COMMENT_FR);
+        dmx.deleteTopicType(ZW.LANGUAGE);
+        dmx.deleteTopicType(ZW.TRANSLATION_EDITED);
+        dmx.deleteTopicType(ZW.LOCKED);
+        dmx.deleteTopicType(ZW.VIEWPORT);
+        dmx.deleteTopicType(ZW.EDITOR);
+        dmx.deleteTopicType(ZW.EDITOR_FACET);
+        dmx.deleteTopicType(ZW.SHOW_EMAIL_ADDRESS);
+        dmx.deleteTopicType(ZW.SHOW_EMAIL_ADDRESS_FACET);
+        //
+        dmx.deleteAssocType(ZW.SHARED_WORKSPACE);
+        dmx.deleteAssocType(ZW.ATTACHMENT);
+        dmx.deleteAssocType(ZW.ORIGINAL_LANGUAGE);
+        dmx.deleteAssocType(ZW.DE);
+        dmx.deleteAssocType(ZW.FR);
     }
 }
