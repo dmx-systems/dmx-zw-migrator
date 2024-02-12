@@ -45,6 +45,17 @@ public class Migration2 extends Migration {
         long textblocks = retypeBilingualTopics("textblock");
         long headings   = retypeBilingualTopics("label", null, "heading");
         //
+        retypeTopics("comment.de", "comment_text");
+        retypeTopics("comment.fr", "comment_text");
+        retypeTopics("document_name.de", "document_name");
+        retypeTopics("document_name.fr", "document_name");
+        retypeTopics("note.de", "note_text");
+        retypeTopics("note.fr", "note_text");
+        retypeTopics("textblock.de", "textblock_text");
+        retypeTopics("textblock.fr", "textblock_text");
+        retypeTopics("label.de", "heading_text");
+        retypeTopics("label.fr", "heading_text");
+        //
         long arrows = retypeTopics("arrow");
         retypeTopics("viewport");
         retypeTopics("language");
@@ -65,7 +76,7 @@ public class Migration2 extends Migration {
         transformWorkspaceModel();
         transformPluginTopic();
         //
-        // deleteZukunftswerkModel();
+        deleteZukunftswerkModel();
         //
         logger.info("##### ZW->Linqa migration complete #####\n  " +
             "Workspaces: " + workspaces + "\n  " +
@@ -86,10 +97,8 @@ public class Migration2 extends Migration {
 
     /**
      * @param   item        URI fragment (mandatory)
-     * @param   biItem      URI fragment (optional, may be null), used in 2 contexts:
-     *                      1) accessing the bilingual child value. If null "item" is used.
-     *                      2) calculating the target type of the bilingual child value.
-     *                         If null "item" or "targetItem" (if given) is used, appended by "_text".
+     * @param   biItem      URI fragment (optional), used for accessing the bilingual child value.
+     *                      If null "item" is used.
      */
     private long retypeBilingualTopics(String item, String biItem, String targetItem) {
         return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
@@ -97,14 +106,10 @@ public class Migration2 extends Migration {
             String _biItem = biItem != null ? biItem : item;
             RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".de");
             RelatedTopic fr = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".fr");
-            String _targetBiItem = "linqa." + (biItem != null ? biItem :
-                                              (targetItem != null ? targetItem : item) + "_text");
             if (de != null) {
-                de.setTypeUri(_targetBiItem);
                 de.getRelatingAssoc().setTypeUri(LQ.LANG1);
             }
             if (fr != null) {
-                fr.setTypeUri(_targetBiItem);
                 fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
             }
             // retype composite
@@ -121,8 +126,13 @@ public class Migration2 extends Migration {
     }
 
     private long retypeTopics(String item) {
+        return retypeTopics(item, null);
+    }
+
+    private long retypeTopics(String item, String targetItem) {
+        String typeUri = "linqa." + (targetItem != null ? targetItem : item);
         return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
-            topic.setTypeUri("linqa." + item);
+            topic.setTypeUri(typeUri);
             return true;
         }).count();
     }
