@@ -39,20 +39,25 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        long comments   = retypeBilingualTopics("comment");
-        long documents  = retypeBilingualTopics("document", "document_name", null);
-        long notes      = retypeBilingualTopics("note");
-        long textblocks = retypeBilingualTopics("textblock");
-        long headings   = retypeBilingualTopics("label", null, "heading");
+        long comments   = retypeBilingualAssocs("comment");
+        long documents  = retypeBilingualAssocs("document", "document_name");
+        long notes      = retypeBilingualAssocs("note");
+        long textblocks = retypeBilingualAssocs("textblock");
+        long headings   = retypeBilingualAssocs("label");
         //
+        retypeTopics("comment");
         retypeTopics("comment.de", "comment_text");
         retypeTopics("comment.fr", "comment_text");
+        retypeTopics("document");
         retypeTopics("document_name.de", "document_name");
         retypeTopics("document_name.fr", "document_name");
+        retypeTopics("note");
         retypeTopics("note.de", "note_text");
         retypeTopics("note.fr", "note_text");
+        retypeTopics("textblock");
         retypeTopics("textblock.de", "textblock_text");
         retypeTopics("textblock.fr", "textblock_text");
+        retypeTopics("label", "heading");
         retypeTopics("label.de", "heading_text");
         retypeTopics("label.fr", "heading_text");
         //
@@ -91,8 +96,8 @@ public class Migration2 extends Migration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private long retypeBilingualTopics(String item) {
-        return retypeBilingualTopics(item, null, null);
+    private long retypeBilingualAssocs(String item) {
+        return retypeBilingualAssocs(item, null);
     }
 
     /**
@@ -100,9 +105,8 @@ public class Migration2 extends Migration {
      * @param   biItem      URI fragment (optional), used for accessing the bilingual child value.
      *                      If null "item" is used.
      */
-    private long retypeBilingualTopics(String item, String biItem, String targetItem) {
+    private long retypeBilingualAssocs(String item, String biItem) {
         return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
-            // bilingual text
             String _biItem = biItem != null ? biItem : item;
             RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".de");
             RelatedTopic fr = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".fr");
@@ -112,9 +116,6 @@ public class Migration2 extends Migration {
             if (fr != null) {
                 fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
             }
-            // retype composite
-            String _targetItem = targetItem != null ? targetItem : item;
-            topic.setTypeUri("linqa." + _targetItem);
             return true;
         }).count();
     }
