@@ -1,0 +1,10 @@
+.lq-login img.logo,           /* Login page's ZW logo */
+.lq-legal .home-button {      /* Lega page's ZW logo */
+  margin-left: -81px;         /* outdent ZW logo */
+}
+
+.lq-login, .lq-legal {
+  background-image: url("/linqa/config/zw-snake/png");
+  background-position: bottom right;
+  background-repeat: no-repeat;
+}
