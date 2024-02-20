@@ -12,12 +12,14 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.ModelFactory;
+import systems.dmx.core.storage.spi.DMXTransaction;
 import systems.dmx.workspaces.WorkspacesService;
 import systems.dmx.zwmigrator.LQ;
 import systems.dmx.zwmigrator.ZW;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 
@@ -116,18 +118,20 @@ public class ZWMigratorThread extends Thread {
      *                      If null "item" is used.
      */
     private long retypeBilingualAssocs(String item, String biItem) {
-        return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
-            String _biItem = biItem != null ? biItem : item;
-            RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".de");
-            RelatedTopic fr = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".fr");
-            if (de != null) {
-                de.getRelatingAssoc().setTypeUri(LQ.LANG1);
-            }
-            if (fr != null) {
-                fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
-            }
-            return true;
-        }).count();
+        return tx(() -> {
+            return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
+                String _biItem = biItem != null ? biItem : item;
+                RelatedTopic de = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".de");
+                RelatedTopic fr = getRelatedTopic(topic, "zukunftswerk." + _biItem + ".fr");
+                if (de != null) {
+                    de.getRelatingAssoc().setTypeUri(LQ.LANG1);
+                }
+                if (fr != null) {
+                    fr.getRelatingAssoc().setTypeUri(LQ.LANG2);
+                }
+                return true;
+            }).count();
+        });
     }
 
     // Note: we can't use model-driven child topic access, in case of shared child topics it would fail.
@@ -141,11 +145,13 @@ public class ZWMigratorThread extends Thread {
     }
 
     private long retypeTopics(String item, String targetItem) {
-        String typeUri = "linqa." + (targetItem != null ? targetItem : item);
-        return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
-            topic.setTypeUri(typeUri);
-            return true;
-        }).count();
+        return tx(() -> {
+            String typeUri = "linqa." + (targetItem != null ? targetItem : item);
+            return dmx.getTopicsByType("zukunftswerk." + item).stream().filter(topic -> {
+                topic.setTypeUri(typeUri);
+                return true;
+            }).count();
+        });
     }
 
     private long retypeAssocs(String item) {
@@ -153,27 +159,32 @@ public class ZWMigratorThread extends Thread {
     }
 
     private long retypeAssocs(String item, String targetItem) {
-        String typeUri = "linqa." + (targetItem != null ? targetItem : item);
-        return dmx.getAssocsByType("zukunftswerk." + item).stream().filter(assoc -> {
-            assoc.setTypeUri(typeUri);
-            return true;
-        }).count();
+        return tx(() -> {
+            String typeUri = "linqa." + (targetItem != null ? targetItem : item);
+            return dmx.getAssocsByType("zukunftswerk." + item).stream().filter(assoc -> {
+                assoc.setTypeUri(typeUri);
+                return true;
+            }).count();
+        });
     }
 
     private long transformProperties() {
         return forAllWorkspaces(ws -> {
-            String wsName = ws.getSimpleValue().toString();
-            logger.info("---------------- \"" + wsName + "\" ----------------");
-            List<Topic> topicmaps = wss.getAssignedTopics(ws.getId(), TOPICMAP);
-            if (topicmaps.size() != 1) {
-                throw new RuntimeException("Workspace " + ws.getId() + " has " + topicmaps.size() +
-                    " topicmaps, expected is 1");
-            }
-            Topic topicmap = topicmaps.get(0);                                     // othersTopicTypeUri=null
-            topicmap.getRelatedTopics(TOPICMAP_CONTEXT, DEFAULT, TOPICMAP_CONTENT, null).stream().forEach(topic -> {
-                Assoc assoc = topic.getRelatingAssoc();
-                transformProperty(assoc, ZW.ZW_COLOR, LQ.LINQA_COLOR);
-                transformProperty(assoc, ZW.ANGLE, LQ.ANGLE);
+            tx(() -> {
+                String wsName = ws.getSimpleValue().toString();
+                logger.info("---------------- \"" + wsName + "\" ----------------");
+                List<Topic> topicmaps = wss.getAssignedTopics(ws.getId(), TOPICMAP);
+                if (topicmaps.size() != 1) {
+                    throw new RuntimeException("Workspace " + ws.getId() + " has " + topicmaps.size() +
+                        " topicmaps, expected is 1");
+                }
+                Topic topicmap = topicmaps.get(0);                                     // othersTopicTypeUri=null
+                topicmap.getRelatedTopics(TOPICMAP_CONTEXT, DEFAULT, TOPICMAP_CONTENT, null).stream().forEach(topic -> {
+                    Assoc assoc = topic.getRelatingAssoc();
+                    transformProperty(assoc, ZW.ZW_COLOR, LQ.LINQA_COLOR);
+                    transformProperty(assoc, ZW.ANGLE, LQ.ANGLE);
+                });
+                return null;
             });
         });
     }
@@ -191,8 +202,11 @@ public class ZWMigratorThread extends Thread {
     }
 
     private void transformAdminProperties() {
-        dmx.getTopicsByType(USERNAME).stream().forEach(topic -> {
-            transformProperty(topic, ZW.USER_ACTIVE, LQ.USER_ACTIVE);
+        tx(() -> {
+            dmx.getTopicsByType(USERNAME).stream().forEach(topic -> {
+                transformProperty(topic, ZW.USER_ACTIVE, LQ.USER_ACTIVE);
+            });
+            return null;
         });
     }
 
@@ -204,57 +218,91 @@ public class ZWMigratorThread extends Thread {
     }
 
     private void transformTeamWorkspace() {
-        dmx.getTopicByUri(ZW.TEAM_WORKSPACE_URI).setUri(LQ.LINQA_ADMIN_WS_URI);
+        tx(() -> {
+            dmx.getTopicByUri(ZW.TEAM_WORKSPACE_URI).setUri(LQ.LINQA_ADMIN_WS_URI);
+            return null;
+        });
     }
 
     private void transformWorkspaceModel() {
-        // "Workspace Name" type def
-        TopicType type = dmx.getTopicType(WORKSPACE);
-        String compDefUri = ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE;
-        type.getCompDef(WORKSPACE_NAME + "#" + ZW.DE).update(mf.newChildTopicsModel().setRef(compDefUri, LQ.LANG1));
-        type.getCompDef(WORKSPACE_NAME + "#" + ZW.FR).update(mf.newChildTopicsModel().setRef(compDefUri, LQ.LANG2));
+        tx(() -> {
+            // "Workspace Name" type def
+            TopicType type = dmx.getTopicType(WORKSPACE);
+            String compDefUri = ASSOC_TYPE + "#" + CUSTOM_ASSOC_TYPE;
+            type.getCompDef(WORKSPACE_NAME + "#" + ZW.DE).update(mf.newChildTopicsModel().setRef(compDefUri, LQ.LANG1));
+            type.getCompDef(WORKSPACE_NAME + "#" + ZW.FR).update(mf.newChildTopicsModel().setRef(compDefUri, LQ.LANG2));
+            return null;
+        });
     }
 
     private void transformPluginTopic() {
-        dmx.getTopicByUri(ZW.ZW_PLUGIN_URI).update(mf.newTopicModel(LQ.LINQA_PLUGIN_URI, PLUGIN,
-            mf.newChildTopicsModel()
-                .set(PLUGIN_NAME, "DMX Linqa")
-                .set(PLUGIN_SYMBOLIC_NAME, LQ.LINQA_PLUGIN_URI)
-                .set(PLUGIN_MIGRATION_NR, 2)
-        ));
+        tx(() -> {
+            dmx.getTopicByUri(ZW.ZW_PLUGIN_URI).update(mf.newTopicModel(LQ.LINQA_PLUGIN_URI, PLUGIN,
+                mf.newChildTopicsModel()
+                    .set(PLUGIN_NAME, "DMX Linqa")
+                    .set(PLUGIN_SYMBOLIC_NAME, LQ.LINQA_PLUGIN_URI)
+                    .set(PLUGIN_MIGRATION_NR, 2)
+            ));
+            return null;
+        });
     }
 
     private void deleteZukunftswerkModel() {
         //
-        dmx.deleteTopicType(ZW.DOCUMENT);
-        dmx.deleteTopicType(ZW.DOCUMENT_NAME_DE);
-        dmx.deleteTopicType(ZW.DOCUMENT_NAME_FR);
-        dmx.deleteTopicType(ZW.ZW_NOTE);
-        dmx.deleteTopicType(ZW.ZW_NOTE_DE);
-        dmx.deleteTopicType(ZW.ZW_NOTE_FR);
-        dmx.deleteTopicType(ZW.TEXTBLOCK);
-        dmx.deleteTopicType(ZW.TEXTBLOCK_DE);
-        dmx.deleteTopicType(ZW.TEXTBLOCK_FR);
-        dmx.deleteTopicType(ZW.LABEL);
-        dmx.deleteTopicType(ZW.LABEL_DE);
-        dmx.deleteTopicType(ZW.LABEL_FR);
-        dmx.deleteTopicType(ZW.ARROW);
-        dmx.deleteTopicType(ZW.COMMENT);
-        dmx.deleteTopicType(ZW.COMMENT_DE);
-        dmx.deleteTopicType(ZW.COMMENT_FR);
-        dmx.deleteTopicType(ZW.LANGUAGE);
-        dmx.deleteTopicType(ZW.TRANSLATION_EDITED);
-        dmx.deleteTopicType(ZW.LOCKED);
-        dmx.deleteTopicType(ZW.VIEWPORT);
-        dmx.deleteTopicType(ZW.EDITOR);
-        dmx.deleteTopicType(ZW.EDITOR_FACET);
-        dmx.deleteTopicType(ZW.SHOW_EMAIL_ADDRESS);
-        dmx.deleteTopicType(ZW.SHOW_EMAIL_ADDRESS_FACET);
+        deleteTopicType(ZW.DOCUMENT);
+        deleteTopicType(ZW.DOCUMENT_NAME_DE);
+        deleteTopicType(ZW.DOCUMENT_NAME_FR);
+        deleteTopicType(ZW.ZW_NOTE);
+        deleteTopicType(ZW.ZW_NOTE_DE);
+        deleteTopicType(ZW.ZW_NOTE_FR);
+        deleteTopicType(ZW.TEXTBLOCK);
+        deleteTopicType(ZW.TEXTBLOCK_DE);
+        deleteTopicType(ZW.TEXTBLOCK_FR);
+        deleteTopicType(ZW.LABEL);
+        deleteTopicType(ZW.LABEL_DE);
+        deleteTopicType(ZW.LABEL_FR);
+        deleteTopicType(ZW.ARROW);
+        deleteTopicType(ZW.COMMENT);
+        deleteTopicType(ZW.COMMENT_DE);
+        deleteTopicType(ZW.COMMENT_FR);
+        deleteTopicType(ZW.LANGUAGE);
+        deleteTopicType(ZW.TRANSLATION_EDITED);
+        deleteTopicType(ZW.LOCKED);
+        deleteTopicType(ZW.VIEWPORT);
+        deleteTopicType(ZW.EDITOR);
+        deleteTopicType(ZW.EDITOR_FACET);
+        deleteTopicType(ZW.SHOW_EMAIL_ADDRESS);
+        deleteTopicType(ZW.SHOW_EMAIL_ADDRESS_FACET);
         //
-        dmx.deleteAssocType(ZW.SHARED_WORKSPACE);
-        dmx.deleteAssocType(ZW.ATTACHMENT);
-        dmx.deleteAssocType(ZW.ORIGINAL_LANGUAGE);
-        dmx.deleteAssocType(ZW.DE);
-        dmx.deleteAssocType(ZW.FR);
+        deleteAssocType(ZW.SHARED_WORKSPACE);
+        deleteAssocType(ZW.ATTACHMENT);
+        deleteAssocType(ZW.ORIGINAL_LANGUAGE);
+        deleteAssocType(ZW.DE);
+        deleteAssocType(ZW.FR);
+    }
+
+    private void deleteTopicType(String typeUri) {
+        tx(() -> {
+            dmx.deleteTopicType(typeUri);
+            return null;
+        });
+    }
+
+    private void deleteAssocType(String typeUri) {
+        tx(() -> {
+            dmx.deleteAssocType(typeUri);
+            return null;
+        });
+    }
+
+    private <T> T tx(Supplier<T> body) {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            T result = body.get();
+            tx.success();
+            return result;
+        } finally {
+            tx.finish();
+        }
     }
 }
