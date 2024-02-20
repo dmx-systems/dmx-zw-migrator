@@ -50,6 +50,7 @@ public class ZWMigratorThread extends Thread {
     @Override
     public void run() {
         logger.info("### Starting ZW->Linqa migration (in background) ###");
+        long time = System.currentTimeMillis();
         //
         long comments   = retypeBilingualAssocs("comment");
         long documents  = retypeBilingualAssocs("document", "document_name");
@@ -95,7 +96,8 @@ public class ZWMigratorThread extends Thread {
         //
         deleteZukunftswerkModel();
         //
-        logger.info("##### ZW->Linqa migration complete #####\n  " +
+        float sec = (System.currentTimeMillis() - time) / 1000f;
+        logger.info("##### ZW->Linqa migration complete (" + sec + " sec) #####\n  " +
             "Workspaces: " + workspaces + "\n  " +
             "Comments: "   + comments + "\n  " +
             "Documents: "  + documents + "\n  " +
