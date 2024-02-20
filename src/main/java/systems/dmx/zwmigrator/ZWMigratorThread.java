@@ -1,4 +1,4 @@
-package systems.dmx.zwmigrator.migrations;
+package systems.dmx.zwmigrator;
 
 import static systems.dmx.accesscontrol.Constants.*;
 import static systems.dmx.core.Constants.*;
@@ -10,8 +10,8 @@ import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
-import systems.dmx.core.service.Inject;
-import systems.dmx.core.service.Migration;
+import systems.dmx.core.service.CoreService;
+import systems.dmx.core.service.ModelFactory;
 import systems.dmx.workspaces.WorkspacesService;
 import systems.dmx.zwmigrator.LQ;
 import systems.dmx.zwmigrator.ZW;
@@ -24,21 +24,31 @@ import java.util.logging.Logger;
 
 /**
  * Transforms a Zukunftswerk instance into a Linqa instance.
- * <p>
- * Runs ALWAYS.
  */
-public class Migration2 extends Migration {
+public class ZWMigratorThread extends Thread {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    @Inject private WorkspacesService wss;
+    private WorkspacesService wss;
+    private CoreService dmx;
+    private ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
+
+    // ---------------------------------------------------------------------------------------------------- Constructors
+
+    ZWMigratorThread(WorkspacesService wss, CoreService dmx, ModelFactory mf) {
+        this.wss = wss;
+        this.dmx = dmx;
+        this.mf = mf;
+    }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
     public void run() {
+        logger.info("### Starting ZW->Linqa migration (in background) ###");
+        //
         long comments   = retypeBilingualAssocs("comment");
         long documents  = retypeBilingualAssocs("document", "document_name");
         long notes      = retypeBilingualAssocs("note");
