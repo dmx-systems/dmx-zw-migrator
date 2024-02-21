@@ -82,17 +82,17 @@ public class ZWMigratorThread extends Thread {
         retypeTopics("editor");
         retypeTopics("show_email_address");
         //
-        retypeAssocs("shared_workspace");
-        retypeAssocs("attachment");
-        retypeAssocs("original_language");
-        retypeAssocs("de", "lang1");
-        retypeAssocs("fr", "lang2");
-        //
         long workspaces = transformProperties();
         transformAdminProperties();
         transformTeamWorkspace();
         transformWorkspaceModel();
         transformPluginTopic();
+        //
+        retypeAssocs("shared_workspace");
+        retypeAssocs("attachment");
+        retypeAssocs("original_language");
+        retypeAssocs("de", "lang1");
+        retypeAssocs("fr", "lang2");
         //
         deleteZukunftswerkModel();
         //
