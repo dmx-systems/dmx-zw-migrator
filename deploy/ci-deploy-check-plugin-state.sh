@@ -28,7 +28,8 @@
 
 
 function check_state() {
-    SEARCH_STRING='INFO: ### Bundles total: 46, DMX plugins: 24, Activated: 24'
+    #SEARCH_STRING='INFO: ### Bundles total: 46, DMX plugins: 24, Activated: 24'
+    SEARCH_STRING='INFO: ##### ZW->Linqa migration complete'
     LOGFILE="$1"
     NUMREGEX='^[0-9]+$'
     if [[ -n "$2" ]] && [[ "$2" =~ ${NUMREGEX} ]]; then
