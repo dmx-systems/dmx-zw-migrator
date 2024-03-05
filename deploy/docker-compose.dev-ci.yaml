@@ -3,7 +3,7 @@ services:
   dmx:
     container_name: "${DEPLOY_PREFIX}-dmx-container"
     restart: always
-    image: container-registry.dmx.systems/dmx-contrib/dmx-docker/dmx-latest:alpine-latest
+    image: container-registry.dmx.systems/dmx-contrib/dmx-docker/dmx-latest:latest
     ports:
       - "${DMX_PORT}:8080"
     environment:
