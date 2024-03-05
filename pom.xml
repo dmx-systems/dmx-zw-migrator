@@ -15,14 +15,14 @@
     <parent>
         <groupId>systems.dmx</groupId>
         <artifactId>dmx-plugin</artifactId>
-        <version>5.3.4-SNAPSHOT</version>
+        <version>5.3.5-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-accesscontrol</artifactId>
-            <version>5.3.4-SNAPSHOT</version>
+            <version>5.3.5-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
